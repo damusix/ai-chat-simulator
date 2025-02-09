@@ -1,0 +1,31 @@
+{
+  "name": "fine-tune",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "move:assets": "find src/ -type f ! -name '*.ts' -exec sh -c 'mkdir -p \"dist/$(dirname \"{}\" | sed \"s|^src/||\")\" && cp \"{}\" \"dist/$(dirname \"{}\" | sed \"s|^src/||\")/$(basename \"{}\")\"' \\;",
+    "watch:server": "nodemon -w dist -e js -x 'node dist/server/index.js'",
+    "watch:assets": "nodemon -w src -e html,css,js,json --ignore '*.ts' -x 'pnpm move:assets'",
+    "watch:build": "nodemon -w src -e ts -x tsc",
+    "dev": "concurrently \"pnpm run watch:server\" \"pnpm run watch:build\" \"pnpm run watch:assets\"",
+    "build": "tsc && pnpm move:assets",
+    "pages": "pnpm run build && ./scripts/publish.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@hapi/hapi": "^21.3.12",
+    "@hapi/mimos": "^7.0.1",
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  }
+}

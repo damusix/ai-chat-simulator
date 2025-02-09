@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>AI Chat Simulator - OpenAI Fine-tuning Dataset Editor</title>
+    <meta name="title" content="AI Chat Simulator - OpenAI Fine-tuning Dataset Editor">
+    <meta name="description" content="Create, edit, and manage OpenAI fine-tuning datasets with this interactive tool. Test prompting strategies and prepare training data for AI models.">
+    <meta name="keywords" content="OpenAI, fine-tuning, AI training, dataset editor, prompt engineering, machine learning, ChatGPT">
+    <meta name="author" content="Danilo Alonso">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://damusix.github.io/ai-chat-simulator/">
+    <meta property="og:title" content="AI Chat Simulator - OpenAI Fine-tuning Dataset Editor">
+    <meta property="og:description" content="Create, edit, and manage OpenAI fine-tuning datasets with this interactive tool. Test prompting strategies and prepare training data for AI models.">
+    <meta property="og:image" content="https://damusix.github.io/ai-chat-simulator/preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://damusix.github.io/ai-chat-simulator/">
+    <meta property="twitter:title" content="AI Chat Simulator - OpenAI Fine-tuning Dataset Editor">
+    <meta property="twitter:description" content="Create, edit, and manage OpenAI fine-tuning datasets with this interactive tool. Test prompting strategies and prepare training data for AI models.">
+    <meta property="twitter:image" content="https://damusix.github.io/ai-chat-simulator/preview.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
+
+    <link rel="stylesheet" href="./assets/styles.css">
+
+    <script>
+        const exports = {};
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <h2>System Instructions</h2>
+            <div id="systemMessages">
+                <!-- System messages will be added here -->
+            </div>
+            <button class="add-system-button" id="addSystemButton">
+                + Add System Instruction
+            </button>
+            <div class="sidebar-footer">
+                <a href="https://github.com/damusix/ai-chat-simulator" target="_blank">
+                    <svg class="github-icon" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+        <div class="chat-area">
+            <div class="top-bar">
+                <div id="chatTitle" class="chat-title">Untitled Chat</div>
+                <div class="top-bar-buttons">
+                    <div class="undo-redo-buttons">
+                        <button id="undoButton" title="Undo (Ctrl+Z)" disabled>↶</button>
+                        <button id="redoButton" title="Redo (Ctrl+Shift+Z)" disabled>↷</button>
+                    </div>
+                    <button id="exportButton">Export Chat</button>
+                    <button id="importButton">Import Chat</button>
+                    <input type="file" id="importInput" accept=".json">
+                    <button id="resetButton">Reset Chat</button>
+                    <button id="helpButton" title="Show Help">?</button>
+                </div>
+            </div>
+            <div class="chat-container">
+                <div class="chat-history" id="chatHistory">
+                    <!-- Messages will be added here dynamically -->
+                </div>
+
+                <div class="input-container">
+                    <div class="input-box">
+                        <textarea
+                            id="userInput"
+                            placeholder="Type your message here..."
+                            rows="1"
+                            onInput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+                        ></textarea>
+                        <button id="sendButton">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script type="module">
+        import markdownIt from 'https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm'
+        window.markdownIt = markdownIt;
+    </script>
+
+    <script src="./assets/index.js"></script>
+
+    <!-- Add these templates before the closing body tag -->
+    <template id="user-message-template">
+        <div class="message user-message">
+            <div class="message-header">
+                <div class="pair-drag-handle" title="Drag to reorder this conversation pair">⋮⋮</div>
+                <div class="conversation-id"></div>
+                <div class="role-label">User</div>
+                <div class="message-buttons">
+                    <button class="primary">Edit</button>
+                    <button class="destructive" title="Delete this and following messages">×</button>
+                </div>
+            </div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <template id="assistant-message-template">
+        <div class="message assistant-message">
+            <div class="message-header">
+                <div class="conversation-id"></div>
+                <div class="role-label">Assistant</div>
+                <div class="message-buttons">
+                    <button class="primary">Edit</button>
+                    <button class="destructive" title="Delete this and following messages">×</button>
+                </div>
+            </div>
+            <div class="message-content"></div>
+        </div>
+    </template>
+
+    <!-- Add this template alongside the other templates -->
+    <template id="system-message-template">
+        <div class="system-message" draggable="true">
+            <div class="system-message-display">
+                <div class="system-message-actions">
+                    <div class="system-message-left">
+                        <div class="system-drag-handle" title="Drag to reorder">⋮⋮</div>
+                        <div class="system-id"></div>
+                    </div>
+                    <div class="system-message-right">
+                        <div class="system-message-buttons">
+                            <button class="primary">Edit</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="system-message-content"></div>
+            </div>
+            <div class="system-message-edit" style="display: none;">
+                <textarea placeholder="Enter system instruction..."></textarea>
+                <div class="system-message-buttons">
+                    <button class="primary">Save</button>
+                    <button>Cancel</button>
+                    <button class="destructive">Delete</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Update assistant-message-template and add new assistant-draft-template -->
+    <template id="assistant-draft-template">
+        <div class="message assistant-message">
+            <div class="message-header">
+                <div class="conversation-id"></div>
+                <div class="role-label">Assistant (Draft)</div>
+                <div class="message-buttons">
+                    <button class="primary">Save Response</button>
+                </div>
+            </div>
+            <div class="message-content draft-content">
+                <textarea
+                    class="assistant-input"
+                    placeholder="Type the assistant response here..."
+                    rows="10"
+                    onInput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"
+                ></textarea>
+            </div>
+        </div>
+    </template>
+
+    <!-- Update the message-edit-template -->
+    <template id="message-edit-template">
+        <div class="edit-container">
+            <textarea class="edit-textarea" rows="10"></textarea>
+            <div class="button-group">
+                <button class="primary">Save</button>
+                <button>Cancel</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Add this template -->
+    <template id="message-modal-template">
+        <div class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-title"></div>
+                    <button class="modal-close">×</button>
+                </div>
+                <div class="modal-content"></div>
+            </div>
+        </div>
+    </template>
+</body>
+</html>
